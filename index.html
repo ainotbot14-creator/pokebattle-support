@@ -35,13 +35,15 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-width: 480px;
+    margin: 0 auto;
+    width: 100%;
     transition: background 0.2s, color 0.2s;
   }
 
   /* ── HEADER ── */
   .header {
     width: 100%;
-    max-width: 480px;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
     padding: 12px 16px;
@@ -211,6 +213,7 @@
 
   .search-input {
     flex: 1;
+    min-width: 0;
     background: var(--surface2);
     border: 1.5px solid var(--border);
     border-radius: var(--radius-sm);
@@ -233,6 +236,8 @@
     box-shadow: 0 2px 8px rgba(232,57,42,0.3);
     transition: transform 0.1s, box-shadow 0.1s;
     white-space: nowrap;
+    flex-shrink: 0;
+    height: 46px;
   }
   .search-go:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(232,57,42,0.4); }
   .search-go:active { transform: translateY(0); }
