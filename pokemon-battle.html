@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Battle Support</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f2f8;
+    --surface: #ffffff;
+    --surface2: #f7f8fc;
+    --border: #e2e6f0;
+    --text: #1a1d2e;
+    --text-sub: #6b7280;
+    --accent: #e8392a;
+    --accent2: #ff6b35;
+    --good: #16a34a;
+    --bad: #9333ea;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    width: 100%;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .header-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 8px rgba(232,57,42,0.35);
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .header-icon:hover { transform: scale(1.08); }
+
+  .header-text { flex: 1; }
+  .header-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+  .header-sub { font-size: 0.65rem; color: var(--text-sub); }
+
+  /* ── THEME SWITCHER ── */
+  .theme-switcher { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .theme-btn {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2.5px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .theme-btn:hover { transform: scale(1.2); }
+  .theme-btn.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(232,57,42,0.2); }
+
+  /* ── PAGES ── */
+  .page { width: 100%; display: none; }
+  .page.active { display: block; }
+
+  /* ── MENU SCREEN ── */
+  #menuPage {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 61px);
+    padding: 40px 24px 60px;
+    gap: 40px;
+    background: var(--bg);
+    transition: background 0.2s;
+  }
+
+  .menu-title-area { text-align: center; }
+  .menu-game-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.5rem, 6vw, 2.2rem);
+    color: var(--text);
+    letter-spacing: 0.03em;
+    margin-bottom: 6px;
+  }
+  .menu-game-sub { font-size: 0.75rem; color: var(--text-sub); letter-spacing: 0.08em; }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .menu-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .menu-item:hover { transform: translateY(-4px); }
+  .menu-item:active { transform: scale(0.95); }
+
+  .menu-icon-wrap {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.6rem;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.16), 0 2px 6px rgba(0,0,0,0.1);
+    border: 3px solid rgba(255,255,255,0.4);
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .menu-icon-wrap::before {
+    content: '';
+    position: absolute;
+    top: 8px; left: 12px;
+    width: 28px; height: 12px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    transform: rotate(-20deg);
+    pointer-events: none;
+  }
+  .menu-item:hover .menu-icon-wrap {
+    box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+    transform: scale(1.05);
+  }
+
+  .menu-item-label {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--text);
+    text-align: center;
+  }
+
+  .menu-hint {
+    font-size: 0.68rem;
+    color: var(--text-sub);
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+    animation: blink-hint 2s ease-in-out infinite;
+  }
+  @keyframes blink-hint { 0%,100%{opacity:0.7} 50%{opacity:0.3} }
+
+  /* ── SHARED BODY ── */
+  .body {
+    width: 100%;
+    max-width: 480px;
+    padding: 20px 16px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* ── SEARCH CARD ── */
+  .search-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .search-label {
+    font-size: 0.7rem; font-weight: 700;
+    color: var(--text-sub);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .search-row { display: flex; gap: 8px; }
+
+  .search-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.95rem;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,57,42,0.1); }
+  .search-input::placeholder { color: #b0b8cc; }
+
+  .search-go {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: var(--radius-sm);
+    color: white;
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.85rem;
+    padding: 0 18px; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(232,57,42,0.3);
+    transition: transform 0.1s, box-shadow 0.1s;
+    white-space: nowrap;
+  }
+  .search-go:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(232,57,42,0.4); }
+  .search-go:active { transform: translateY(0); }
+
+  .suggest-box {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    display: none;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: var(--shadow);
+  }
+  .suggestion-item {
+    padding: 10px 14px; cursor: pointer;
+    font-size: 0.88rem; color: var(--text);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .suggestion-item::before { content: '→'; color: var(--accent); font-weight: 700; font-size: 0.75rem; }
+  .suggestion-item:last-child { border-bottom: none; }
+  .suggestion-item:hover { background: var(--surface2); }
+
+  /* ── FORM TABS ── */
+  .form-tabs {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .form-tab {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border); border-radius: 20px;
+    padding: 5px 12px; font-size: 0.75rem; font-weight: 600;
+    color: var(--text-sub); cursor: pointer;
+    transition: all 0.15s; font-family: 'Noto Sans JP', sans-serif;
+  }
+  .form-tab:hover { border-color: var(--accent); color: var(--accent); }
+  .form-tab.active {
+    background: var(--accent); border-color: var(--accent);
+    color: white; box-shadow: 0 2px 8px rgba(232,57,42,0.3);
+  }
+  .form-tab-label { font-size: 0.58rem; opacity: 0.7; letter-spacing: 0.04em; font-weight: 700; }
+  .form-tab.active .form-tab-label { opacity: 0.85; }
+
+  /* ── POKEMON CARD ── */
+  .poke-header-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+  }
+  .poke-banner {
+    background: linear-gradient(135deg, #1a1d2e 0%, #2d3561 60%, #1a2a5e 100%);
+    padding: 20px 18px 16px;
+    display: flex; align-items: center; gap: 16px;
+    position: relative; overflow: hidden;
+  }
+  .poke-banner::before {
+    content: ''; position: absolute; top:-30px; right:-30px;
+    width:120px; height:120px; border-radius:50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .sprite-wrap {
+    width: 80px; height: 80px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid rgba(255,255,255,0.15);
+    flex-shrink: 0; position: relative; z-index: 1;
+  }
+  .sprite-wrap img { width:72px; height:72px; image-rendering:pixelated; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4)); }
+  .poke-banner-info { flex: 1; position: relative; z-index: 1; }
+  .poke-no { font-family:'Outfit',sans-serif; font-weight:600; font-size:0.7rem; color:rgba(255,255,255,0.5); letter-spacing:0.1em; margin-bottom:2px; }
+  .poke-name { font-family:'Outfit',sans-serif; font-weight:900; font-size:1.6rem; color:white; letter-spacing:-0.02em; line-height:1.1; margin-bottom:8px; }
+  .type-chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px; }
+  .type-chip { font-size:0.68rem; font-weight:700; padding:3px 10px; border-radius:20px; letter-spacing:0.04em; border:1px solid rgba(255,255,255,0.25); }
+
+  /* ── ABILITY TABS ── */
+  .ability-tabs { display:flex; gap:5px; flex-wrap:wrap; }
+  .ability-tab {
+    display:inline-flex; align-items:center; gap:4px;
+    background:rgba(255,255,255,0.1); border:1.5px solid rgba(255,255,255,0.2);
+    border-radius:20px; padding:4px 10px; font-size:0.72rem;
+    color:rgba(255,255,255,0.75); cursor:pointer; transition:all 0.15s;
+    font-family:'Noto Sans JP',sans-serif;
+  }
+  .ability-tab:hover { background:rgba(255,255,255,0.18); color:white; }
+  .ability-tab.active { background:rgba(255,255,255,0.25); border-color:rgba(255,255,255,0.6); color:white; font-weight:700; }
+  .ability-tab-label { font-size:0.55rem; opacity:0.6; letter-spacing:0.04em; font-weight:600; }
+  .ability-tab.dream { border-color:rgba(253,230,138,0.4); }
+  .ability-tab.dream .ability-tab-label { color:#fde68a; opacity:1; }
+  .ability-tab.dream.active { background:rgba(253,230,138,0.2); border-color:rgba(253,230,138,0.8); }
+
+  /* ── MATCHUP ── */
+  .matchup-row {
+    display:grid; grid-template-columns:1fr 1fr; gap:10px;
+    padding:14px; background:var(--surface2); border-top:1px solid var(--border);
+  }
+  .matchup-panel { background:var(--surface); border-radius:var(--radius-sm); padding:12px; border:1px solid var(--border); }
+  .matchup-head { font-size:0.68rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:5px; }
+  .matchup-head.weak { color:var(--good); }
+  .matchup-head.resist { color:var(--bad); }
+  .matchup-head .dot { width:6px; height:6px; border-radius:50%; }
+  .matchup-head.weak .dot { background:var(--good); }
+  .matchup-head.resist .dot { background:var(--bad); }
+  .chip-wrap { display:flex; flex-wrap:wrap; gap:4px; }
+  .mult-tag { font-size:0.55rem; font-weight:700; padding:1px 4px; border-radius:4px; margin-left:2px; vertical-align:middle; }
+  .x4 { background:#fee2e2; color:#dc2626; }
+  .x2 { background:#dcfce7; color:#16a34a; }
+  .x0 { background:#f3f4f6; color:#6b7280; }
+
+  /* ── ADVANTAGE SECTION ── */
+  .section-header { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .section-label { font-family:'Outfit',sans-serif; font-weight:700; font-size:0.85rem; color:var(--text); }
+  .section-badge { background:var(--accent); color:white; font-size:0.6rem; font-weight:700; padding:2px 7px; border-radius:20px; }
+
+  .poke-list { display:flex; flex-direction:column; gap:8px; }
+  .poke-row {
+    background:var(--surface); border-radius:var(--radius-sm); border:1px solid var(--border);
+    padding:10px 12px; display:flex; align-items:stretch; gap:10px;
+    box-shadow:var(--shadow); animation:fadeUp 0.2s ease both;
+    transition:box-shadow 0.15s, transform 0.15s;
+  }
+  .poke-row:hover { box-shadow:0 4px 16px rgba(0,0,0,0.1); transform:translateY(-1px); }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .row-left { display:flex; flex-direction:column; align-items:center; gap:4px; flex-shrink:0; width:70px; }
+  .row-sprite { width:50px; height:50px; image-rendering:pixelated; background:var(--surface2); border-radius:50%; border:1px solid var(--border); }
+  .row-info { display:flex; flex-direction:column; align-items:center; }
+  .row-name { font-family:'Outfit',sans-serif; font-weight:700; font-size:0.78rem; color:var(--text); text-align:center; line-height:1.2; }
+  .row-types { display:flex; gap:3px; flex-wrap:wrap; justify-content:center; margin-top:3px; }
+  .row-right { flex:1; min-width:0; border-left:1px solid var(--border); padding-left:10px; display:flex; flex-direction:column; justify-content:center; }
+  .move-section-label { font-size:0.58rem; font-weight:700; color:var(--text-sub); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:5px; }
+  .move-chips { display:flex; flex-wrap:wrap; gap:3px; }
+  .move-chip { background:var(--surface2); border:1px solid var(--border); border-radius:5px; padding:2px 8px; font-size:0.68rem; color:var(--text-sub); }
+
+  /* ── MOVE DAMAGE LIST ── */
+  .move-dmg-list { display:flex; flex-direction:column; gap:4px; }
+  .move-dmg-row { display:flex; align-items:center; gap:7px; }
+  .move-dmg-name {
+    font-size:0.68rem; color:var(--text-sub); font-weight:500;
+    width:72px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .move-dmg-bar-wrap {
+    flex:1; height:8px; background:var(--surface2);
+    border-radius:4px; overflow:hidden; border:1px solid var(--border);
+    min-width:40px;
+  }
+  .move-dmg-bar { height:100%; border-radius:4px; transition:width 0.4s ease; }
+  .move-dmg-pct-label {
+    font-size:0.65rem; font-weight:700;
+    width:36px; text-align:right; flex-shrink:0;
+  }
+
+  /* ── PARTY BUILDER ── */
+  .party-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+  .party-slot {
+    background:var(--surface); border:2px dashed var(--border); border-radius:var(--radius);
+    padding:10px 6px 8px; display:flex; flex-direction:column; align-items:center;
+    gap:3px; min-height:96px; justify-content:center; position:relative; transition:border-color 0.15s;
+  }
+  .party-slot.filled { border-style:solid; border-color:var(--border); }
+  .party-slot-sprite { width:52px; height:52px; image-rendering:pixelated; }
+  .party-slot-name { font-size:0.62rem; font-weight:700; color:var(--text); text-align:center; line-height:1.2; }
+  .party-slot-types { display:flex; gap:2px; flex-wrap:wrap; justify-content:center; }
+  .party-slot-empty { font-size:2rem; opacity:0.15; }
+  .party-remove { position:absolute; top:4px; right:4px; width:18px; height:18px; border-radius:50%; background:var(--accent); color:white; border:none; font-size:0.6rem; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; font-weight:900; }
+
+  .party-analysis { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow); }
+  .analysis-title { font-family:'Outfit',sans-serif; font-weight:700; font-size:0.85rem; color:var(--text); margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+  .weakness-row { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+  .wk-chip { font-size:0.6rem; font-weight:700; padding:2px 7px; border-radius:4px; min-width:56px; text-align:center; }
+  .weakness-bar-wrap { flex:1; height:7px; background:var(--surface2); border-radius:4px; overflow:hidden; border:1px solid var(--border); }
+  .weakness-bar { height:100%; border-radius:4px; transition:width 0.5s ease; }
+  .weakness-count { font-size:0.68rem; font-weight:700; min-width:20px; text-align:right; }
+  .wk-count-1{color:#f59e0b} .wk-count-2{color:#f97316} .wk-count-3{color:#ef4444} .wk-count-high{color:#991b1b}
+  .analysis-empty { text-align:center; color:var(--text-sub); font-size:0.82rem; padding:20px 0; opacity:0.6; }
+  .suggest-section { margin-top:14px; padding-top:12px; border-top:1px solid var(--border); }
+  .suggest-title { font-size:0.72rem; font-weight:700; color:var(--text-sub); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:8px; }
+  .suggest-chips { display:flex; flex-wrap:wrap; gap:5px; }
+  .suggest-chip { background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:4px 10px; font-size:0.72rem; color:var(--text); font-weight:600; cursor:pointer; transition:all 0.15s; }
+  .suggest-chip:hover { border-color:var(--accent); color:var(--accent); }
+
+  /* ── SUGGEST POKEMON GRID ── */
+  .suggest-poke-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .suggest-poke-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 5px 6px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 3px;
+    transition: border-color 0.12s, transform 0.12s;
+  }
+  .suggest-poke-card:hover { border-color:var(--accent); transform:translateY(-2px); }
+  .suggest-poke-name { font-size:0.6rem; font-weight:700; color:var(--text); text-align:center; line-height:1.2; }
+  .suggest-poke-types { display:flex; gap:2px; flex-wrap:wrap; justify-content:center; }
+
+  /* ── PARTY DETAIL CARDS ── */
+  .party-detail-list { display:flex; flex-direction:column; gap:10px; }
+
+  .party-detail-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .party-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .party-detail-sprite {
+    width: 44px; height: 44px;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+  }
+
+  .party-detail-name-area { flex: 1; min-width: 0; }
+
+  .party-detail-name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+
+  .party-detail-types { display: flex; gap: 4px; }
+
+  .party-detail-body { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+
+  /* 種族値 */
+  .stat-table { display: flex; flex-direction: column; gap: 4px; }
+
+  .stat-row { display: flex; align-items: center; gap: 6px; }
+
+  .stat-label {
+    font-size: 0.6rem; font-weight: 700;
+    color: var(--text-sub);
+    width: 38px; flex-shrink: 0;
+    letter-spacing: 0.03em;
+  }
+
+  .stat-bar-wrap {
+    flex: 1; height: 6px;
+    background: var(--surface2);
+    border-radius: 3px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .stat-bar { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+
+  .stat-value {
+    font-size: 0.68rem; font-weight: 700;
+    color: var(--text);
+    width: 26px; text-align: right; flex-shrink: 0;
+  }
+
+  .stat-total {
+    font-size: 0.65rem; font-weight: 700;
+    color: var(--text-sub);
+    text-align: right;
+    margin-top: 2px;
+    letter-spacing: 0.03em;
+  }
+
+  /* 特性 */
+  .ability-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .ability-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+  }
+
+  .ability-item-head {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  .ability-item-name {
+    font-size: 0.78rem; font-weight: 700;
+    color: var(--text);
+  }
+
+  .ability-dream-badge {
+    font-size: 0.55rem; font-weight: 700;
+    background: #fde68a; color: #92400e;
+    padding: 1px 5px; border-radius: 4px;
+    letter-spacing: 0.03em;
+  }
+
+  .ability-item-desc {
+    font-size: 0.7rem;
+    color: var(--text-sub);
+    line-height: 1.5;
+  }
+
+  .detail-section-label {
+    font-size: 0.65rem; font-weight: 700;
+    color: var(--text-sub);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  /* ── ADVANTAGE FORM TABS ── */
+  .adv-form-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+    overflow: hidden;
+  }
+  .adv-form-btn {
+    flex: 1;
+    font-size: 0.72rem; font-weight: 700;
+    padding: 7px 4px;
+    border: none; border-right: 1px solid var(--border);
+    background: transparent; color: var(--text-sub);
+    cursor: pointer; transition: all 0.12s;
+    font-family: 'Noto Sans JP', sans-serif;
+    letter-spacing: 0.02em;
+  }
+  .adv-form-btn:last-child { border-right: none; }
+  .adv-form-btn:hover { background: var(--surface); color: var(--accent); }
+  .adv-form-btn.active {
+    background: var(--surface);
+    color: var(--accent);
+    box-shadow: inset 0 -2.5px 0 var(--accent);
+  }
+
+  /* ── DETAIL FORM TABS ── */
+  .party-detail-name-row {
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap; margin-bottom: 3px;
+  }
+  .detail-form-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+  .detail-form-btn {
+    font-size: 0.58rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--surface2); color: var(--text-sub);
+    cursor: pointer; transition: all 0.12s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .detail-form-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .detail-form-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+  /* ── LOADING / ERROR ── */
+  .loading { text-align:center; padding:24px; color:var(--text-sub); font-size:0.85rem; display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .spinner { width:28px; height:28px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.7s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .error-card { background:#fff5f5; border:1.5px solid #fca5a5; border-radius:var(--radius-sm); padding:16px; text-align:center; font-size:0.85rem; color:#dc2626; }
+  .more-btn { width:100%; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-sm); color:var(--text-sub); font-family:'Outfit',sans-serif; font-weight:600; font-size:0.82rem; padding:11px; cursor:pointer; margin-top:4px; transition:all 0.15s; }
+  .more-btn:hover { border-color:var(--accent); color:var(--accent); background:#fff8f7; }
+
+  /* ── PAGE TRANSITION ── */
+  .page-anim { animation:pageIn 0.2s ease both; }
+  @keyframes pageIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+  /* Type colors */
+  .t-normal{background:#A8A878;color:#fff} .t-fire{background:#F08030;color:#fff}
+  .t-water{background:#6890F0;color:#fff} .t-electric{background:#F8D030;color:#222}
+  .t-grass{background:#78C850;color:#fff} .t-ice{background:#98D8D8;color:#222}
+  .t-fighting{background:#C03028;color:#fff} .t-poison{background:#A040A0;color:#fff}
+  .t-ground{background:#E0C068;color:#222} .t-flying{background:#A890F0;color:#fff}
+  .t-psychic{background:#F85888;color:#fff} .t-bug{background:#A8B820;color:#fff}
+  .t-rock{background:#B8A038;color:#fff} .t-ghost{background:#705898;color:#fff}
+  .t-dragon{background:#7038F8;color:#fff} .t-dark{background:#705848;color:#fff}
+  .t-steel{background:#B8B8D0;color:#222} .t-fairy{background:#EE99AC;color:#222}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-icon" onclick="goMenu()" title="メニューへ戻る">⚔️</div>
+  <div class="header-text">
+    <div class="header-title" id="headerTitle">Battle Support</div>
+    <div class="header-sub" id="headerSub">対戦サポートシステム</div>
+  </div>
+  <div class="theme-switcher" id="themeSwitcher">
+    <button class="theme-btn" data-theme="default" style="background:#f0f2f8;"></button>
+    <button class="theme-btn" data-theme="night"   style="background:#1e2030;"></button>
+    <button class="theme-btn" data-theme="forest"  style="background:#e8f0e8;"></button>
+    <button class="theme-btn" data-theme="sand"    style="background:#f5ede0;"></button>
+    <button class="theme-btn" data-theme="sky"     style="background:#e0eeff;"></button>
+  </div>
+</div>
+
+<!-- Menu Page -->
+<div id="menuPage">
+  <div class="menu-title-area">
+    <div class="menu-game-title">BATTLE SUPPORT</div>
+    <div class="menu-game-sub">ポケモン対戦サポートシステム</div>
+  </div>
+  <div class="menu-grid">
+    <div class="menu-item" onclick="goPage('battle')">
+      <div class="menu-icon-wrap" style="background:linear-gradient(135deg,#e8392a,#ff6b35);">⚔️</div>
+      <div class="menu-item-label">対戦サポート</div>
+    </div>
+    <div class="menu-item" onclick="goPage('party')">
+      <div class="menu-icon-wrap" style="background:linear-gradient(135deg,#3b6fd4,#60a5fa);">🛡️</div>
+      <div class="menu-item-label">パーティ構築</div>
+    </div>
+  </div>
+  <div class="menu-hint">タップして選択</div>
+</div>
+
+<!-- Battle Page -->
+<div id="battlePage" class="page">
+  <div class="body">
+    <div class="search-card">
+      <div class="search-label">相手のポケモン</div>
+      <div class="search-row">
+        <input class="search-input" type="text" id="battleInput" placeholder="例：ガブリアス" autocomplete="off" />
+        <button class="search-go" onclick="searchPokemon(document.getElementById('battleInput').value.trim())">検索</button>
+      </div>
+      <div class="suggest-box" id="battleSuggest"></div>
+    </div>
+    <div id="battleResult"></div>
+  </div>
+</div>
+
+<!-- Party Page -->
+<div id="partyPage" class="page">
+  <div class="body">
+    <div class="search-card">
+      <div class="search-label">ポケモンを追加（最大6体）</div>
+      <div class="search-row">
+        <input class="search-input" type="text" id="partyInput" placeholder="例：ガブリアス" autocomplete="off" />
+        <button class="search-go" onclick="addToParty(document.getElementById('partyInput').value.trim())">追加</button>
+      </div>
+      <div class="suggest-box" id="partySuggest"></div>
+      <div id="partyError" style="display:none;margin-top:8px;padding:8px 12px;background:#fff5f5;border:1px solid #fca5a5;border-radius:6px;font-size:0.82rem;color:#dc2626;"></div>
+    </div>
+    <div class="party-grid" id="partyGrid"></div>
+    <div id="partyAnalysis"></div>
+    <div id="partyDetail"></div>
+  </div>
+</div>
+
+<script>
+// ── THEMES ──
+const THEMES = {
+  default:{ '--bg':'#f0f2f8','--surface':'#ffffff','--surface2':'#f7f8fc','--border':'#e2e6f0','--text':'#1a1d2e','--text-sub':'#6b7280','--shadow':'0 2px 12px rgba(0,0,0,0.07)','--shadow-lg':'0 8px 32px rgba(0,0,0,0.12)' },
+  night:  { '--bg':'#1e2030','--surface':'#272a3f','--surface2':'#1e2236','--border':'#363a55','--text':'#e2e8f0','--text-sub':'#8892a4','--shadow':'0 2px 12px rgba(0,0,0,0.3)','--shadow-lg':'0 8px 32px rgba(0,0,0,0.45)' },
+  forest: { '--bg':'#e8f0e8','--surface':'#f4faf4','--surface2':'#edf6ed','--border':'#ccdece','--text':'#1a2d1a','--text-sub':'#4a6b4a','--shadow':'0 2px 12px rgba(0,0,0,0.07)','--shadow-lg':'0 8px 32px rgba(0,0,0,0.1)' },
+  sand:   { '--bg':'#f5ede0','--surface':'#fffdf8','--surface2':'#fdf6ec','--border':'#e8d9c4','--text':'#2d1e0f','--text-sub':'#7a5f3a','--shadow':'0 2px 12px rgba(0,0,0,0.07)','--shadow-lg':'0 8px 32px rgba(0,0,0,0.1)' },
+  sky:    { '--bg':'#e0eeff','--surface':'#f5f9ff','--surface2':'#eaf2ff','--border':'#c5d9f5','--text':'#0f1d3a','--text-sub':'#4a6080','--shadow':'0 2px 12px rgba(0,0,0,0.07)','--shadow-lg':'0 8px 32px rgba(0,0,0,0.1)' },
+};
+
+function applyTheme(name) {
+  const t = THEMES[name]; if (!t) return;
+  for (const [k,v] of Object.entries(t)) document.documentElement.style.setProperty(k,v);
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.theme===name));
+  // メニュー背景も更新
+  document.getElementById('menuPage').style.background = t['--bg'];
+  localStorage.setItem('bt-theme', name);
+}
+
+document.getElementById('themeSwitcher').addEventListener('click', e => {
+  const b = e.target.closest('.theme-btn');
+  if (b) applyTheme(b.dataset.theme);
+});
+
+// ── PAGE ROUTING ──
+let currentPage = 'menu';
+
+function goMenu() {
+  document.getElementById('menuPage').style.display = '';
+  document.getElementById('battlePage').classList.remove('active','page-anim');
+  document.getElementById('partyPage').classList.remove('active','page-anim');
+  document.getElementById('headerTitle').textContent = 'Battle Support';
+  document.getElementById('headerSub').textContent = '対戦サポートシステム';
+  currentPage = 'menu';
+}
+
+function goPage(name) {
+  document.getElementById('menuPage').style.display = 'none';
+  document.getElementById('battlePage').classList.remove('active','page-anim');
+  document.getElementById('partyPage').classList.remove('active','page-anim');
+
+  if (name === 'battle') {
+    const p = document.getElementById('battlePage');
+    p.classList.add('active');
+    requestAnimationFrame(() => p.classList.add('page-anim'));
+    document.getElementById('headerTitle').textContent = '対戦サポート';
+    document.getElementById('headerSub').textContent = 'タイプ相性 / 有利ポケモン';
+  } else if (name === 'party') {
+    const p = document.getElementById('partyPage');
+    p.classList.add('active');
+    requestAnimationFrame(() => p.classList.add('page-anim'));
+    document.getElementById('headerTitle').textContent = 'パーティ構築';
+    document.getElementById('headerSub').textContent = '弱点分析 / 補完提案';
+    renderPartyGrid();
+  }
+  currentPage = name;
+}
+
+// ── DATA ──
+const TYPE_JA = {
+  normal:'ノーマル',fire:'ほのお',water:'みず',electric:'でんき',
+  grass:'くさ',ice:'こおり',fighting:'かくとう',poison:'どく',
+  ground:'じめん',flying:'ひこう',psychic:'エスパー',bug:'むし',
+  rock:'いわ',ghost:'ゴースト',dragon:'ドラゴン',dark:'あく',
+  steel:'はがね',fairy:'フェアリー'
+};
+const TYPE_CLASS = {
+  normal:'t-normal',fire:'t-fire',water:'t-water',electric:'t-electric',
+  grass:'t-grass',ice:'t-ice',fighting:'t-fighting',poison:'t-poison',
+  ground:'t-ground',flying:'t-flying',psychic:'t-psychic',bug:'t-bug',
+  rock:'t-rock',ghost:'t-ghost',dragon:'t-dragon',dark:'t-dark',
+  steel:'t-steel',fairy:'t-fairy'
+};
+const TYPE_CHART = {
+  normal:{rock:.5,ghost:0,steel:.5},
+  fire:{fire:.5,water:.5,grass:2,ice:2,bug:2,rock:.5,dragon:.5,steel:2},
+  water:{fire:2,water:.5,grass:.5,ground:2,rock:2,dragon:.5},
+  electric:{water:2,electric:.5,grass:.5,ground:0,flying:2,dragon:.5},
+  grass:{fire:.5,water:2,grass:.5,poison:.5,ground:2,flying:.5,bug:.5,rock:2,dragon:.5,steel:.5},
+  ice:{fire:.5,water:.5,grass:2,ice:.5,ground:2,flying:2,dragon:2,steel:.5},
+  fighting:{normal:2,ice:2,poison:.5,flying:.5,psychic:.5,bug:.5,rock:2,ghost:0,dark:2,steel:2,fairy:.5},
+  poison:{grass:2,poison:.5,ground:.5,rock:.5,ghost:.5,steel:0,fairy:2},
+  ground:{fire:2,electric:2,grass:.5,poison:2,flying:0,bug:.5,rock:2,steel:2},
+  flying:{electric:.5,grass:2,fighting:2,bug:2,rock:.5,steel:.5},
+  psychic:{fighting:2,poison:2,psychic:.5,dark:0,steel:.5},
+  bug:{fire:.5,grass:2,fighting:.5,poison:.5,flying:.5,psychic:2,ghost:.5,dark:2,steel:.5,fairy:.5},
+  rock:{fire:2,ice:2,fighting:.5,ground:.5,flying:2,bug:2,steel:.5},
+  ghost:{normal:0,fighting:0,poison:.5,bug:.5,ghost:2,dark:.5},
+  dragon:{dragon:2,steel:.5,fairy:0},
+  dark:{fighting:.5,psychic:2,ghost:2,dark:.5,fairy:.5},
+  steel:{fire:.5,water:.5,electric:.5,ice:2,rock:2,steel:.5,fairy:2},
+  fairy:{fire:.5,fighting:2,poison:.5,dragon:2,dark:2,steel:.5},
+};
+
+function calcDefenseMultipliers(types, abilityName) {
+  const mult = {};
+  for (const t of Object.keys(TYPE_JA)) mult[t] = 1.0;
+  for (const def of types)
+    for (const atk of Object.keys(TYPE_JA)) {
+      const m = (TYPE_CHART[atk]||{})[def];
+      if (m !== undefined) mult[atk] *= m;
+    }
+  if (abilityName==='levitate') mult.ground=0;
+  else if (abilityName==='flash-fire') mult.fire=0;
+  else if (['volt-absorb','motor-drive','lightning-rod'].includes(abilityName)) mult.electric=0;
+  else if (['water-absorb','storm-drain'].includes(abilityName)) mult.water=0;
+  else if (abilityName==='dry-skin') { mult.water=0; mult.fire*=1.25; }
+  else if (abilityName==='sap-sipper') mult.grass=0;
+  else if (abilityName==='thick-fat') { mult.fire*=.5; mult.ice*=.5; }
+  else if (abilityName==='heatproof') mult.fire*=.5;
+  else if (abilityName==='wonder-guard') for (const t of Object.keys(mult)) { if (mult[t]<=1) mult[t]=0; }
+  return mult;
+}
+
+function getWeaknesses(mult) {
+  const weak=[],immune=[],resist=[];
+  for (const [t,m] of Object.entries(mult)) {
+    if (m===0) immune.push({type:t,mult:0});
+    else if (m>=4) weak.push({type:t,mult:4});
+    else if (m>=2) weak.push({type:t,mult:2});
+    else if (m<1) resist.push({type:t,mult:m});
+  }
+  return {weak,immune,resist};
+}
+
+// ── API ──
+const cache = {};
+async function fetchAPI(url) {
+  if (cache[url]) return cache[url];
+  const r = await fetch(url);
+  if (!r.ok) throw new Error('not found');
+  const d = await r.json();
+  cache[url] = d;
+  return d;
+}
+
+let jaNameMap={}, enToJa={}, cachedJaList=null;
+
+async function getJaList() {
+  if (cachedJaList) return cachedJaList;
+  const d = await fetchAPI('https://pokeapi.co/api/v2/pokemon-species?limit=1025');
+  cachedJaList = d.results;
+  return cachedJaList;
+}
+
+async function getJaName(enName) {
+  if (enToJa[enName]) return enToJa[enName];
+  try {
+    const sp = await fetchAPI(`https://pokeapi.co/api/v2/pokemon-species/${enName}`);
+    const j = sp.names.find(n=>n.language.name==='ja-Hrkt')||sp.names.find(n=>n.language.name==='ja');
+    const ja = j?j.name:enName;
+    enToJa[enName]=ja; jaNameMap[ja]=enName;
+    return ja;
+  } catch { return enName; }
+}
+
+async function isFinalEvolution(enName) {
+  try {
+    const sp = await fetchAPI(`https://pokeapi.co/api/v2/pokemon-species/${enName}`);
+    const evo = await fetchAPI(sp.evolution_chain.url);
+    const finals=[];
+    function collect(n) { if(!n.evolves_to?.length) finals.push(n.species.name); else n.evolves_to.forEach(collect); }
+    collect(evo.chain);
+    return finals.includes(enName);
+  } catch { return true; }
+}
+
+// ── SUGGEST ──
+function setupSuggest(inputId, suggestId, onSelect) {
+  const input = document.getElementById(inputId);
+  const box   = document.getElementById(suggestId);
+  let timer;
+  input.addEventListener('input', () => {
+    clearTimeout(timer);
+    const q = input.value.trim();
+    if (!q) { box.style.display='none'; return; }
+    timer = setTimeout(async () => {
+      await getJaList();
+      let results = Object.keys(jaNameMap).filter(ja=>ja.includes(q));
+      if (results.length < 5) {
+        const list = await getJaList();
+        await Promise.all(list.slice(0,200).map(p=>getJaName(p.name).catch(()=>{})));
+        const more = Object.keys(jaNameMap).filter(ja=>ja.includes(q)&&!results.includes(ja));
+        results = [...results,...more];
+      }
+      results = results.slice(0,7);
+      if (!results.length) { box.style.display='none'; return; }
+      box.innerHTML = results.map(ja=>`<div class="suggestion-item" data-ja="${ja}">${ja}</div>`).join('');
+      box.style.display = 'block';
+      box.querySelectorAll('.suggestion-item').forEach(el=>{
+        el.addEventListener('click', ()=>{
+          input.value = el.dataset.ja;
+          box.style.display = 'none';
+          onSelect(el.dataset.ja);
+        });
+      });
+    }, 280);
+  });
+  input.addEventListener('keydown', e=>{
+    if (e.key==='Enter') { box.style.display='none'; onSelect(input.value.trim()); }
+  });
+  document.addEventListener('click', e=>{
+    if (!box.contains(e.target)&&e.target!==input) box.style.display='none';
+  });
+}
+
+setupSuggest('battleInput','battleSuggest', searchPokemon);
+setupSuggest('partyInput', 'partySuggest',  addToParty);
+
+// ── BATTLE PAGE ──
+const battleResult = document.getElementById('battleResult');
+
+async function searchPokemon(jaName) {
+  if (!jaName) return;
+  battleResult.innerHTML = `<div class="loading"><div class="spinner"></div><span>データを取得中...</span></div>`;
+  try {
+    let enName = jaNameMap[jaName];
+    if (!enName) {
+      const list = await getJaList();
+      for (let i=0;i<list.length;i+=50) {
+        await Promise.all(list.slice(i,i+50).map(p=>getJaName(p.name)));
+        if (jaNameMap[jaName]) break;
+      }
+      enName = jaNameMap[jaName];
+    }
+    if (!enName) { battleResult.innerHTML=`<div class="error-card">「${jaName}」が見つかりませんでした。</div>`; return; }
+
+    const speciesData = await fetchAPI(`https://pokeapi.co/api/v2/pokemon-species/${enName}`);
+    const defaultVariety = speciesData.varieties.find(v=>v.is_default) || speciesData.varieties[0];
+    const pokeData = await fetchAPI(defaultVariety.pokemon.url);
+
+    const jaNameResult = await getJaName(enName);
+    const pokeNum = String(speciesData.id).padStart(3,'0');
+
+    // メガ進化検出
+    const megaNames = speciesData.varieties.map(v=>v.pokemon.name)
+      .filter(n=>n.includes('-mega')||n.includes('-primal')||n.includes('-gmax'));
+    const megaDataList = await Promise.all(megaNames.map(n=>fetchAPI(`https://pokeapi.co/api/v2/pokemon/${n}`).catch(()=>null)));
+
+    const forms = [{ id:'base', label:'ノーマル', pData:pokeData }];
+    megaDataList.forEach((md,i)=>{
+      if (!md) return;
+      const n = megaNames[i];
+      let label = 'メガ';
+      if (n.endsWith('-mega-x')) label='メガX';
+      else if (n.endsWith('-mega-y')) label='メガY';
+      else if (n.includes('-primal')) label='ゲンシ';
+      else if (n.includes('-gmax')) label='キョダイ';
+      forms.push({id:n, label, pData:md});
+    });
+
+    let currentFormIdx=0, currentAbilityIdx=0;
+    const formAbilitiesCache={};
+
+    async function getAbilities(pData) {
+      const raw = pData.abilities;
+      const details = await Promise.all(raw.map(a=>fetchAPI(`https://pokeapi.co/api/v2/ability/${a.ability.name}`)));
+      return raw.map((a,i)=>{
+        const d=details[i];
+        const ja=d.names.find(n=>n.language.name==='ja-Hrkt')?.name||d.names.find(n=>n.language.name==='ja')?.name||a.ability.name;
+        return {en:a.ability.name, ja, isDream:a.is_hidden};
+      });
+    }
+
+    async function renderBattle(formIdx, abilityIdx) {
+      const form = forms[formIdx];
+      const pData = form.pData;
+      const types = pData.types.map(t=>t.type.name);
+      const sprite = pData.sprites.front_default||'';
+      if (!formAbilitiesCache[formIdx]) formAbilitiesCache[formIdx] = await getAbilities(pData);
+      const abilities = formAbilitiesCache[formIdx];
+      if (abilityIdx >= abilities.length) abilityIdx=0;
+      const selectedAbility = abilities[abilityIdx];
+      const mult = calcDefenseMultipliers(types, selectedAbility.en);
+      const {weak,immune,resist} = getWeaknesses(mult);
+
+      const formTabsHtml = forms.length > 1 ? `<div class="form-tabs">${forms.map((f,fi)=>`
+        <button class="form-tab ${fi===formIdx?'active':''}" onclick="window._switchForm(${fi})">
+          ${fi>0?'<span class="form-tab-label">MEGA</span>':''}${f.label}
+        </button>`).join('')}</div>` : '';
+
+      const typeChipsHtml = types.map(t=>`<span class="type-chip ${TYPE_CLASS[t]}">${TYPE_JA[t]||t}</span>`).join('');
+      const abilityTabsHtml = abilities.map((ab,i)=>`
+        <button class="ability-tab ${ab.isDream?'dream':''} ${i===abilityIdx?'active':''}" onclick="window._switchAbility(${i})">
+          <span class="ability-tab-label">${ab.isDream?'夢':'特性'}</span><span>${ab.ja}</span>
+        </button>`).join('');
+
+      const weakHtml = weak.sort((a,b)=>b.mult-a.mult).map(w=>
+        `<span class="type-chip ${TYPE_CLASS[w.type]}" style="font-size:.65rem;padding:3px 8px;border-radius:5px">${TYPE_JA[w.type]}<span class="mult-tag ${w.mult>=4?'x4':'x2'}">×${w.mult}</span></span>`
+      ).join('')||'<span style="color:#9ca3af;font-size:.8rem">なし</span>';
+
+      const immuneResistHtml = [
+        ...immune.map(w=>`<span class="type-chip ${TYPE_CLASS[w.type]}" style="font-size:.65rem;padding:3px 8px;border-radius:5px;opacity:.65">${TYPE_JA[w.type]}<span class="mult-tag x0">×0</span></span>`),
+        ...resist.map(w=>`<span class="type-chip ${TYPE_CLASS[w.type]}" style="font-size:.65rem;padding:3px 8px;border-radius:5px;opacity:.7">${TYPE_JA[w.type]}</span>`)
+      ].join('')||'<span style="color:#9ca3af;font-size:.8rem">なし</span>';
+
+      const displayName = formIdx===0 ? jaNameResult :
+        `${jaNameResult}（${forms[formIdx].label}）`;
+
+      battleResult.innerHTML = `
+        ${formTabsHtml}
+        <div class="poke-header-card">
+          <div class="poke-banner">
+            <div class="sprite-wrap">${sprite?`<img src="${sprite}" alt="${displayName}">`:''}</div>
+            <div class="poke-banner-info">
+              <div class="poke-no">No.${pokeNum}</div>
+              <div class="poke-name">${displayName}</div>
+              <div class="type-chips">${typeChipsHtml}</div>
+              <div class="ability-tabs">${abilityTabsHtml}</div>
+            </div>
+          </div>
+          <div class="matchup-row">
+            <div class="matchup-panel">
+              <div class="matchup-head weak"><span class="dot"></span>弱点タイプ</div>
+              <div class="chip-wrap">${weakHtml}</div>
+            </div>
+            <div class="matchup-panel">
+              <div class="matchup-head resist"><span class="dot"></span>無効・半減</div>
+              <div class="chip-wrap">${immuneResistHtml}</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-header">
+          <span class="section-label">有利なポケモン＆推奨技</span>
+          <span class="section-badge">最終進化優先</span>
+        </div>
+        <div class="poke-list" id="pokeList">
+          <div class="loading"><div class="spinner"></div><span>検索中...</span></div>
+        </div>`;
+
+      const advantageTypes = weak.map(w=>w.type);
+      // 相手の種族値を取得（HP・防御・特防）
+      const targetStats = {};
+      for (const s of pData.stats) targetStats[s.stat.name] = s.base_stat;
+      if (advantageTypes.length>0) loadAdvantagePokemons(advantageTypes, mult, targetStats);
+      else document.getElementById('pokeList').innerHTML='<div style="color:#9ca3af;text-align:center;padding:20px;font-size:.85rem">弱点がありません</div>';
+    }
+
+    window._switchForm = fi => { currentFormIdx=fi; currentAbilityIdx=0; renderBattle(fi,0); };
+    window._switchAbility = idx => { currentAbilityIdx=idx; renderBattle(currentFormIdx,idx); };
+    await renderBattle(0,0);
+
+  } catch(e) {
+    console.error(e);
+    battleResult.innerHTML=`<div class="error-card">データの取得に失敗しました。もう一度お試しください。</div>`;
+  }
+}
+
+async function loadAdvantagePokemons(advantageTypes, targetMult, targetStats={}) {
+  const pokeList = document.getElementById('pokeList');
+  if (!pokeList) return;
+  try {
+    const typePokemons={};
+    await Promise.all(advantageTypes.slice(0,4).map(async t=>{
+      const d = await fetchAPI(`https://pokeapi.co/api/v2/type/${t}`);
+      typePokemons[t] = d.pokemon.map(p=>p.pokemon.name);
+    }));
+
+    // メガ・キョダイ・フォーム違いを基本形態名に統一してスコアを集約
+    const baseNameOf = name => name
+      .replace(/-mega(-[xy])?$/,'').replace(/-gmax$/,'').replace(/-primal$/,'')
+      .replace(/-alola$/,'').replace(/-galar$/,'').replace(/-hisui$/,'').replace(/-paldea$/,'');
+
+    const candidateMap={};
+    for (const [t,names] of Object.entries(typePokemons))
+      for (const name of names) {
+        const base = baseNameOf(name);
+        if (!candidateMap[base]) candidateMap[base]={name:base, score:0};
+        candidateMap[base].score += targetMult[t]||0;
+      }
+
+    const candidates = Object.values(candidateMap).sort((a,b)=>b.score-a.score).slice(0,50);
+
+    // 最終進化 + 伝説/準伝/幻フラグを並行取得
+    const metaList = await Promise.all(candidates.map(async c=>{
+      try {
+        const sp = await fetchAPI(`https://pokeapi.co/api/v2/pokemon-species/${c.name}`);
+        const isFinal = await isFinalEvolution(c.name).catch(()=>true);
+        return {
+          ...c,
+          isFinal,
+          isLegendary: sp.is_legendary || false,
+          isMythical:  sp.is_mythical  || false,
+        };
+      } catch { return {...c, isFinal:true, isLegendary:false, isMythical:false}; }
+    }));
+
+    // ソート: ①通常最終進化 → ②伝説/準伝 → ③幻 → ④未進化
+    metaList.sort((a,b)=>{
+      const rankA = a.isMythical?3 : a.isLegendary?2 : a.isFinal?0:1;
+      const rankB = b.isMythical?3 : b.isLegendary?2 : b.isFinal?0:1;
+      if (rankA !== rankB) return rankA - rankB;
+      return b.score - a.score;
+    });
+
+    const sorted = metaList.slice(0, 25);
+
+    // SV準拠ダメージ計算（Lv50・努力値なし・性格補正なし）
+    function calcDmgPct(move, attackerTypes, atkStat, spAtkStat) {
+      const isPhysical = move.damageClass === 'physical';
+      const atkVal = isPhysical ? atkStat : spAtkStat;
+      const defKey = isPhysical ? 'defense' : 'special-defense';
+      const defVal = targetStats[defKey] || 100;
+      const hpVal  = targetStats['hp']   || 100;
+      const stab   = attackerTypes.includes(move.type) ? 1.5 : 1.0;
+      const typeM  = targetMult[move.type] || 1.0;
+      const dmg = (((2*50/5+2) * move.power * (atkVal/defVal)) / 50 + 2) * stab * typeM;
+      return Math.min(100, Math.round(dmg / hpVal * 100));
+    }
+
+    const results=[];
+    await Promise.all(sorted.map(async c=>{
+      try {
+        const sp = await fetchAPI(`https://pokeapi.co/api/v2/pokemon-species/${c.name}`);
+        const defaultVariety = sp.varieties.find(v=>v.is_default) || sp.varieties[0];
+        const pd = await fetchAPI(defaultVariety.pokemon.url);
+        const jaName = await getJaName(c.name);
+        const pokeTypes = pd.types.map(t=>t.type.name);
+        const atkStat   = pd.stats.find(s=>s.stat.name==='attack')?.base_stat || 100;
+        const spAtkStat = pd.stats.find(s=>s.stat.name==='special-attack')?.base_stat || 100;
+        const moveDetails = await Promise.all(pd.moves.slice(0,30).map(m=>fetchAPI(m.move.url).catch(()=>null)));
+        const goodMoves = moveDetails
+          .filter(m=>m&&advantageTypes.includes(m.type?.name)&&m.power&&m.power>0)
+          .sort((a,b)=>{const aB=pokeTypes.includes(a.type.name)?1.5:1,bB=pokeTypes.includes(b.type.name)?1.5:1;return (b.power*bB)-(a.power*aB);})
+          .slice(0,3);
+        const movesData = await Promise.all(goodMoves.map(async m=>{
+          const j = m.names?.find(n=>n.language.name==='ja-Hrkt')||m.names?.find(n=>n.language.name==='ja');
+          return { name:j?j.name:m.name, power:m.power, type:m.type?.name, damageClass:m.damage_class?.name };
+        }));
+        // メガ・キョダイフォームを取得
+        const altVarietyNames = sp.varieties
+          .filter(v=>!v.is_default)
+          .map(v=>v.pokemon.name)
+          .filter(n=>n.includes('-mega')||n.includes('-primal')||n.includes('-gmax'));
+
+        async function buildAdvForm(pData, label) {
+          const fTypes = pData.types.map(t=>t.type.name);
+          const fAtk   = pData.stats.find(s=>s.stat.name==='attack')?.base_stat||100;
+          const fSpAtk = pData.stats.find(s=>s.stat.name==='special-attack')?.base_stat||100;
+          const fMoveDetails = await Promise.all(pData.moves.slice(0,30).map(m=>fetchAPI(m.move.url).catch(()=>null)));
+          const fGoodMoves = fMoveDetails
+            .filter(m=>m&&advantageTypes.includes(m.type?.name)&&m.power&&m.power>0)
+            .sort((a,b)=>{const aB=fTypes.includes(a.type.name)?1.5:1,bB=fTypes.includes(b.type.name)?1.5:1;return (b.power*bB)-(a.power*aB);})
+            .slice(0,3);
+          const fMoves = await Promise.all(fGoodMoves.map(async m=>{
+            const j=m.names?.find(n=>n.language.name==='ja-Hrkt')||m.names?.find(n=>n.language.name==='ja');
+            return {name:j?j.name:m.name, power:m.power, type:m.type?.name, damageClass:m.damage_class?.name};
+          }));
+          return {label, sprite:pData.sprites.front_default, types:fTypes, moves:fMoves, atkStat:fAtk, spAtkStat:fSpAtk};
+        }
+
+        const baseForm = await buildAdvForm(pd, 'ノーマル');
+        const altForms = [];
+        for (const n of altVarietyNames) {
+          try {
+            const md = await fetchAPI(`https://pokeapi.co/api/v2/pokemon/${n}`);
+            let label='メガ';
+            if (n.endsWith('-mega-x')) label='メガX';
+            else if (n.endsWith('-mega-y')) label='メガY';
+            else if (n.includes('-primal')) label='ゲンシ';
+            else if (n.includes('-gmax')) label='キョダイ';
+            altForms.push(await buildAdvForm(md, label));
+          } catch {}
+        }
+        const forms = [baseForm, ...altForms];
+
+        results.push({
+          jaName, sprite:pd.sprites.front_default, types:pokeTypes,
+          moves:movesData, atkStat, spAtkStat,
+          forms, activeForm:0,
+          score:c.score, isFinal:c.isFinal, isLegendary:c.isLegendary, isMythical:c.isMythical
+        });
+      } catch {}
+    }));
+
+    // ソート維持（取得順がバラけるので再ソート）
+    results.sort((a,b)=>{
+      const rankA = a.isMythical?3 : a.isLegendary?2 : a.isFinal?0:1;
+      const rankB = b.isMythical?3 : b.isLegendary?2 : b.isFinal?0:1;
+      if (rankA !== rankB) return rankA - rankB;
+      return b.score - a.score;
+    });
+
+    if (!document.getElementById('pokeList')) return;
+    const display=results.slice(0,8), rest=results.slice(8);
+
+    // advResults はグローバルに保持して切り替え時に再描画
+    window._advResults = results;
+    window._advCalcDmgPct = calcDmgPct;
+
+    function buildPokeRowHtml(p, globalIdx, animIdx) {
+      const af = p.forms[p.activeForm||0];
+      const curTypes  = af.types;
+      const curSprite = af.sprite;
+      const curMoves  = af.moves;
+      const curAtk    = af.atkStat;
+      const curSpAtk  = af.spAtkStat;
+
+      const dmgRows = curMoves.length
+        ? curMoves.map(m=>{
+            const pct = calcDmgPct(m, curTypes, curAtk, curSpAtk);
+            const color = pct>=100?'#dc2626':pct>=50?'#f97316':pct>=25?'#eab308':'#6b7280';
+            return `<div class="move-dmg-row">
+              <span class="move-dmg-name">${m.name}</span>
+              <div class="move-dmg-bar-wrap">
+                <div class="move-dmg-bar" style="width:${pct}%;background:${color}"></div>
+              </div>
+              <span class="move-dmg-pct-label" style="color:${color}">${pct}%</span>
+            </div>`;
+          }).join('')
+        : '<span style="color:#9ca3af;font-size:.7rem">データなし</span>';
+
+      const legendBadge = p.isMythical
+        ? `<span style="font-size:.5rem;background:#a855f7;color:white;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:3px">幻</span>`
+        : p.isLegendary
+        ? `<span style="font-size:.5rem;background:#f59e0b;color:white;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:3px">伝説</span>`
+        : '';
+
+      const formTabsHtml = p.forms.length > 1
+        ? `<div class="adv-form-tabs">${p.forms.map((f,fi)=>`
+            <button class="adv-form-btn ${fi===(p.activeForm||0)?'active':''}"
+              onclick="switchAdvForm(${globalIdx},${fi})">${f.label}</button>`).join('')}</div>`
+        : '';
+
+      return `
+      <div class="poke-row" id="adv-row-${globalIdx}" style="animation-delay:${animIdx*.04}s;padding:0;flex-direction:column;overflow:hidden;">
+        ${formTabsHtml}
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;">
+          <div class="row-left" style="margin:0;">
+            ${curSprite?`<img src="${curSprite}" class="row-sprite" alt="${p.jaName}">`:'<div style="width:50px;height:50px;border-radius:50%;background:var(--surface2)"></div>'}
+            <div class="row-info">
+              <div class="row-name">${p.jaName}${legendBadge}</div>
+              <div class="row-types">${curTypes.map(t=>`<span class="type-chip ${TYPE_CLASS[t]}" style="font-size:.6rem;padding:2px 7px;border-radius:4px">${TYPE_JA[t]||t}</span>`).join('')}</div>
+            </div>
+          </div>
+          <div class="row-right">
+            <div class="move-section-label">推奨技 / ダメージ</div>
+            <div class="move-dmg-list">${dmgRows}</div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    const renderCards = list=>list.map((p,i)=>buildPokeRowHtml(p, results.indexOf(p), i)).join('');
+
+    const listEl=document.getElementById('pokeList');
+    if (!listEl) return;
+    listEl.innerHTML=renderCards(display);
+    if (rest.length>0) {
+      const btn=document.createElement('button');
+      btn.className='more-btn'; btn.textContent=`さらに ${rest.length} 件表示`;
+      btn.onclick=()=>{listEl.innerHTML+=renderCards(rest);btn.remove();};
+      listEl.appendChild(btn);
+    }
+  } catch(e) {
+    const el=document.getElementById('pokeList');
+    if (el) el.innerHTML='<div class="error-card">ポケモンデータの取得に失敗しました。</div>';
+  }
+}
+
+// ── ADVANTAGE FORM SWITCH ──
+window.switchAdvForm = function(globalIdx, formIdx) {
+  if (!window._advResults) return;
+  const p = window._advResults[globalIdx];
+  if (!p || !p.forms) return;
+  p.activeForm = formIdx;
+  const row = document.getElementById(`adv-row-${globalIdx}`);
+  if (!row) return;
+  // buildPokeRowHtml を再実行して該当行だけ置き換え
+  const tmp = document.createElement('div');
+  tmp.innerHTML = buildAdvRowHtml(p, globalIdx);
+  row.replaceWith(tmp.firstElementChild);
+};
+
+function buildAdvRowHtml(p, globalIdx) {
+  if (!window._advCalcDmgPct) return '';
+  const calcDmgPct = window._advCalcDmgPct;
+  const af = p.forms[p.activeForm||0];
+  const curTypes=af.types, curSprite=af.sprite, curMoves=af.moves, curAtk=af.atkStat, curSpAtk=af.spAtkStat;
+  const dmgRows = curMoves.length
+    ? curMoves.map(m=>{
+        const pct=calcDmgPct(m,curTypes,curAtk,curSpAtk);
+        const color=pct>=100?'#dc2626':pct>=50?'#f97316':pct>=25?'#eab308':'#6b7280';
+        return `<div class="move-dmg-row">
+          <span class="move-dmg-name">${m.name}</span>
+          <div class="move-dmg-bar-wrap"><div class="move-dmg-bar" style="width:${pct}%;background:${color}"></div></div>
+          <span class="move-dmg-pct-label" style="color:${color}">${pct}%</span>
+        </div>`;
+      }).join('')
+    : '<span style="color:#9ca3af;font-size:.7rem">データなし</span>';
+  const legendBadge = p.isMythical
+    ? `<span style="font-size:.5rem;background:#a855f7;color:white;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:3px">幻</span>`
+    : p.isLegendary
+    ? `<span style="font-size:.5rem;background:#f59e0b;color:white;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:3px">伝説</span>`
+    : '';
+  const formTabsHtml = p.forms.length>1
+    ? `<div class="adv-form-tabs">${p.forms.map((f,fi)=>`
+        <button class="adv-form-btn ${fi===(p.activeForm||0)?'active':''}"
+          onclick="switchAdvForm(${globalIdx},${fi})">${f.label}</button>`).join('')}</div>`
+    : '';
+  return `
+  <div class="poke-row" id="adv-row-${globalIdx}" style="padding:0;flex-direction:column;overflow:hidden;">
+    ${formTabsHtml}
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;">
+      <div class="row-left" style="margin:0;">
+        ${curSprite?`<img src="${curSprite}" class="row-sprite" alt="${p.jaName}">`:'<div style="width:50px;height:50px;border-radius:50%;background:var(--surface2)"></div>'}
+        <div class="row-info">
+          <div class="row-name">${p.jaName}${legendBadge}</div>
+          <div class="row-types">${curTypes.map(t=>`<span class="type-chip ${TYPE_CLASS[t]}" style="font-size:.6rem;padding:2px 7px;border-radius:4px">${TYPE_JA[t]||t}</span>`).join('')}</div>
+        </div>
+      </div>
+      <div class="row-right">
+        <div class="move-section-label">推奨技 / ダメージ</div>
+        <div class="move-dmg-list">${dmgRows}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── PARTY PAGE ──
+let party=[];
+
+function renderPartyGrid() {
+  const grid=document.getElementById('partyGrid'); if(!grid) return;
+  let html='';
+  for (let i=0;i<6;i++) {
+    const p=party[i];
+    if (p) {
+      const curForm = p.forms ? p.forms[p.formIdx||0] : null;
+      const displayTypes = curForm ? curForm.types : p.types;
+      const displaySprite = curForm ? curForm.sprite : p.sprite;
+      html += `<div class="party-slot filled">
+           <button class="party-remove" onclick="removeFromParty(${i})">✕</button>
+           ${displaySprite?`<img src="${displaySprite}" class="party-slot-sprite" alt="${p.jaName}">`:''}
+           <div class="party-slot-name">${p.jaName}</div>
+           <div class="party-slot-types">${displayTypes.map(t=>`<span class="type-chip ${TYPE_CLASS[t]}" style="font-size:.52rem;padding:1px 5px;border-radius:3px">${TYPE_JA[t]||t}</span>`).join('')}</div>
+         </div>`;
+    } else {
+      html += `<div class="party-slot"><div class="party-slot-empty">＋</div></div>`;
+    }
+  }
+  grid.innerHTML=html;
+  renderPartyAnalysis();
+}
+
+function renderPartyAnalysis() {
+  const el=document.getElementById('partyAnalysis'); if(!el) return;
+  const filled=party.filter(Boolean);
+  if (!filled.length) { el.innerHTML=''; return; }
+  const weakCount={};
+  for (const t of Object.keys(TYPE_JA)) weakCount[t]=0;
+  for (const p of filled) {
+    const mult=calcDefenseMultipliers(p.types,'');
+    for (const [t,m] of Object.entries(mult)) if (m>=2) weakCount[t]++;
+  }
+  const sorted=Object.entries(weakCount).filter(([,c])=>c>0).sort((a,b)=>b[1]-a[1]);
+  const maxCount=filled.length;
+  const barsHtml=sorted.map(([t,c])=>{
+    const pct=(c/maxCount)*100;
+    const barColor=c>=4?'#dc2626':c>=3?'#f97316':c>=2?'#f59e0b':'#6b7280';
+    const countClass=c>=4?'wk-count-high':c>=3?'wk-count-3':c>=2?'wk-count-2':'wk-count-1';
+    return `<div class="weakness-row">
+      <span class="wk-chip type-chip ${TYPE_CLASS[t]}">${TYPE_JA[t]}</span>
+      <div class="weakness-bar-wrap"><div class="weakness-bar" style="width:${pct}%;background:${barColor}"></div></div>
+      <span class="weakness-count ${countClass}">${c}/${maxCount}</span>
+    </div>`;
+  }).join('');
+  const topWeak=sorted.slice(0,3).map(([t])=>t);
+  const suggestTypes=Object.keys(TYPE_JA).filter(atk=>
+    topWeak.some(def=>(TYPE_CHART[atk]||{})[def]>=2)&&!filled.flatMap(p=>p.types).includes(atk)
+  ).slice(0,6);
+  const suggestTypeChips = suggestTypes.map(t=>
+    `<span class="suggest-chip type-chip ${TYPE_CLASS[t]}" style="background:none;border-color:currentColor">${TYPE_JA[t]}</span>`
+  ).join('');
+
+  el.innerHTML=`<div class="party-analysis">
+    <div class="analysis-title">⚠️ 弱点分析（${filled.length}体）</div>
+    ${barsHtml||'<div class="analysis-empty">弱点なし</div>'}
+    ${suggestTypes.length?`
+      <div class="suggest-section">
+        <div class="suggest-title">補完候補タイプ</div>
+        <div class="suggest-chips">${suggestTypeChips}</div>
+        <div class="suggest-poke-grid" id="suggestPokeGrid">
+          <div class="loading" style="padding:12px 0;grid-column:1/-1"><div class="spinner"></div></div>
+        </div>
+      </div>`:''}
+  </div>`;
+
+  renderPartyDetail(filled);
+  if (suggestTypes.length) loadSuggestPokemons(suggestTypes);
+}
+
+async function loadSuggestPokemons(suggestTypes) {
+  const grid = document.getElementById('suggestPokeGrid');
+  if (!grid) return;
+  try {
+    const seen = new Set();
+    const results = [];
+    await Promise.all(suggestTypes.slice(0,4).map(async t => {
+      const data = await fetchAPI(`https://pokeapi.co/api/v2/type/${t}`);
+      const names = data.pokemon.map(p=>p.pokemon.name);
+      const checked = await Promise.all(names.slice(0,25).map(async name=>{
+        try {
+          const sp = await fetchAPI(`https://pokeapi.co/api/v2/pokemon-species/${name}`);
+          const isFinal = await isFinalEvolution(name).catch(()=>true);
+          return { name, isFinal, isLegendary:sp.is_legendary||false, isMythical:sp.is_mythical||false };
+        } catch { return null; }
+      }));
+      const valid = checked.filter(c=>c&&c.isFinal&&!c.isLegendary&&!c.isMythical);
+      let added = 0;
+      for (const c of valid) {
+        if (seen.has(c.name)) continue;
+        seen.add(c.name);
+        results.push({...c, suggestType:t});
+        if (++added >= 2) break;
+      }
+    }));
+
+    const pokemonCards = await Promise.all(results.map(async c=>{
+      try {
+        const sp = await fetchAPI(`https://pokeapi.co/api/v2/pokemon-species/${c.name}`);
+        const defaultVar = sp.varieties.find(v=>v.is_default)||sp.varieties[0];
+        const pd = await fetchAPI(defaultVar.pokemon.url);
+        const jaName = await getJaName(c.name);
+        return { jaName, sprite:pd.sprites.front_default, types:pd.types.map(t=>t.type.name) };
+      } catch { return null; }
+    }));
+
+    const valid = pokemonCards.filter(Boolean);
+    const g = document.getElementById('suggestPokeGrid');
+    if (!g) return;
+    if (!valid.length) { g.innerHTML='<div style="color:var(--text-sub);font-size:.75rem;padding:8px 0;grid-column:1/-1">候補が見つかりませんでした</div>'; return; }
+
+    g.innerHTML = valid.map(p=>`
+      <div class="suggest-poke-card">
+        <div class="suggest-poke-name">${p.jaName}</div>
+        <div class="suggest-poke-types">${p.types.map(t=>`<span class="type-chip ${TYPE_CLASS[t]}" style="font-size:.48rem;padding:1px 4px;border-radius:3px">${TYPE_JA[t]}</span>`).join('')}</div>
+      </div>`).join('');
+  } catch(e) {
+    const g = document.getElementById('suggestPokeGrid');
+    if (g) g.innerHTML='';
+  }
+}
+
+function renderPartyDetail(filled) {
+  let el = document.getElementById('partyDetail');
+  if (!el) return;
+
+  const STAT_JA = { hp:'HP', attack:'こうげき', defense:'ぼうぎょ',
+    'special-attack':'とくこう', 'special-defense':'とくぼう', speed:'すばやさ' };
+  const STAT_COLOR = { hp:'#ef4444', attack:'#f97316', defense:'#eab308',
+    'special-attack':'#3b82f6', 'special-defense':'#8b5cf6', speed:'#10b981' };
+  const STAT_ORDER = ['hp','attack','defense','special-attack','special-defense','speed'];
+
+  const cards = filled.map(p => {
+    const typeChips = p.types.map(t=>`<span class="type-chip ${TYPE_CLASS[t]}" style="font-size:.6rem;padding:2px 7px;border-radius:4px">${TYPE_JA[t]||t}</span>`).join('');
+
+    // 種族値
+    let total = 0;
+    const statRows = STAT_ORDER.map(key => {
+      const val = (p.stats||{})[key] || 0;
+      total += val;
+      const pct = Math.min(100, (val/255)*100);
+      return `<div class="stat-row">
+        <span class="stat-label">${STAT_JA[key]||key}</span>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:${pct}%;background:${STAT_COLOR[key]}"></div></div>
+        <span class="stat-value">${val}</span>
+      </div>`;
+    }).join('');
+
+    // 特性
+    const abilityItems = (p.abilities||[]).map(ab => `
+      <div class="ability-item">
+        <div class="ability-item-head">
+          <span class="ability-item-name">${ab.ja}</span>
+          ${ab.isDream?'<span class="ability-dream-badge">夢特性</span>':''}
+        </div>
+        ${ab.desc?`<div class="ability-item-desc">${ab.desc}</div>`:''}
+      </div>`).join('');
+
+    const pi = party.findIndex(x=>x&&x.jaName===p.jaName&&x.enName===p.enName);
+    const formTabsHtml = (p.forms && p.forms.length > 1)
+      ? `<div class="detail-form-tabs">${p.forms.map((f,fi)=>`
+          <button class="detail-form-btn ${fi===(p.formIdx||0)?'active':''}"
+            onclick="switchPartyForm(${pi},${fi})">${f.label}</button>`).join('')}</div>`
+      : '';
+    return `
+      <div class="party-detail-card">
+        <div class="party-detail-header">
+          ${p.sprite?`<img src="${p.sprite}" class="party-detail-sprite" alt="${p.jaName}">` : ''}
+          <div class="party-detail-name-area">
+            <div class="party-detail-name-row">
+              <span class="party-detail-name">${p.jaName}</span>
+              ${formTabsHtml}
+            </div>
+            <div class="party-detail-types">${typeChips}</div>
+          </div>
+        </div>
+        <div class="party-detail-body">
+          <div>
+            <div class="detail-section-label">📊 種族値</div>
+            <div class="stat-table">${statRows}</div>
+            <div class="stat-total">合計 ${total}</div>
+          </div>
+          <div>
+            <div class="detail-section-label">✨ 特性</div>
+            <div class="ability-list">${abilityItems||'<span style="color:var(--text-sub);font-size:.8rem">データなし</span>'}</div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  el.innerHTML = `<div class="detail-section-label" style="margin-bottom:8px">📋 ポケモン詳細</div><div class="party-detail-list">${cards}</div>`;
+}
+
+function removeFromParty(idx) { party.splice(idx,1); renderPartyGrid(); }
+
+function switchPartyForm(partyIdx, formIdx) {
+  const p = party[partyIdx]; if (!p || !p.forms) return;
+  p.formIdx = formIdx;
+  const f = p.forms[formIdx];
+  // 弱点分析・詳細カード用に types/stats/abilities を現在フォームで上書き
+  p.types    = f.types;
+  p.stats    = f.stats;
+  p.abilities = f.abilities;
+  p.sprite   = f.sprite;
+  renderPartyGrid();
+}
+
+async function addToParty(jaName) {
+  if (!jaName) return;
+  const partyInput=document.getElementById('partyInput');
+  const partyError=document.getElementById('partyError');
+  function showPartyError(msg) {
+    if(partyError){partyError.textContent=msg;partyError.style.display='block';setTimeout(()=>{partyError.style.display='none';},3000);}
+  }
+  if (party.filter(Boolean).length>=6) { showPartyError('パーティは最大6体です'); return; }
+  if (partyInput) partyInput.value='';
+  let enName=jaNameMap[jaName];
+  if (!enName) {
+    const list=await getJaList();
+    for (let i=0;i<list.length;i+=50) {
+      await Promise.all(list.slice(i,i+50).map(p=>getJaName(p.name)));
+      if (jaNameMap[jaName]) break;
+    }
+    enName=jaNameMap[jaName];
+  }
+  if (!enName) { showPartyError(`「${jaName}」が見つかりませんでした`); return; }
+  try {
+    const sp = await fetchAPI(`https://pokeapi.co/api/v2/pokemon-species/${enName}`);
+    const defaultVariety = sp.varieties.find(v=>v.is_default) || sp.varieties[0];
+    const pd = await fetchAPI(defaultVariety.pokemon.url);
+    const jaNameResult = await getJaName(enName);
+
+    // メガ・キョダイフォームを検出
+    const altVarietyNames = sp.varieties
+      .filter(v => !v.is_default)
+      .map(v => v.pokemon.name)
+      .filter(n => n.includes('-mega') || n.includes('-primal') || n.includes('-gmax'));
+    const altDataList = await Promise.all(
+      altVarietyNames.map(n => fetchAPI(`https://pokeapi.co/api/v2/pokemon/${n}`).catch(()=>null))
+    );
+
+    // フォームリストを構築
+    async function buildFormData(pData, label) {
+      const stats = {};
+      for (const s of pData.stats) stats[s.stat.name] = s.base_stat;
+      const aDetails = await Promise.all(
+        pData.abilities.map(a => fetchAPI(`https://pokeapi.co/api/v2/ability/${a.ability.name}`))
+      );
+      const abilities = pData.abilities.map((a,i) => {
+        const d = aDetails[i];
+        const ja = d.names.find(n=>n.language.name==='ja-Hrkt')?.name
+                 || d.names.find(n=>n.language.name==='ja')?.name || a.ability.name;
+        const jaFlavor = d.flavor_text_entries.filter(e=>e.language.name==='ja');
+        const desc = jaFlavor.length ? jaFlavor[jaFlavor.length-1].flavor_text : '';
+        return { ja, isDream: a.is_hidden, desc };
+      });
+      return { label, sprite: pData.sprites.front_default, types: pData.types.map(t=>t.type.name), stats, abilities };
+    }
+
+    const baseForm = await buildFormData(pd, 'ノーマル');
+    const altForms = [];
+    for (let i=0; i<altVarietyNames.length; i++) {
+      const md = altDataList[i]; if (!md) continue;
+      const n = altVarietyNames[i];
+      let label = 'メガ';
+      if (n.endsWith('-mega-x')) label='メガX';
+      else if (n.endsWith('-mega-y')) label='メガY';
+      else if (n.includes('-primal')) label='ゲンシ';
+      else if (n.includes('-gmax')) label='キョダイ';
+      altForms.push(await buildFormData(md, label));
+    }
+
+    const forms = [baseForm, ...altForms];
+
+    party.push({
+      enName, jaName: jaNameResult,
+      sprite: pd.sprites.front_default,
+      types: pd.types.map(t=>t.type.name),
+      stats: baseForm.stats,
+      abilities: baseForm.abilities,
+      forms,        // 全フォームデータ
+      formIdx: 0    // 現在表示中のフォーム
+    });
+    renderPartyGrid();
+  } catch(e) { console.error(e); showPartyError('データの取得に失敗しました'); }
+}
+
+// ── INIT ──
+applyTheme(localStorage.getItem('bt-theme')||'default');
+renderPartyGrid();
+
+// バックグラウンドで先読み
+(async()=>{
+  const list=await getJaList();
+  for (let i=0;i<500;i+=20) {
+    Promise.all(list.slice(i,i+20).map(p=>getJaName(p.name)));
+    await new Promise(r=>setTimeout(r,80));
+  }
+})();
+</script>
+</body>
+</html>
