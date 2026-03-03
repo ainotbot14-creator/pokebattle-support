@@ -873,7 +873,7 @@ function setupSuggest(inputId, suggestId, onSelect) {
   let timer;
   input.addEventListener('input', () => {
     clearTimeout(timer);
-    const q = input.value.trim();
+    const q = toKatakana(input.value.trim());
     if (!q) { box.style.display='none'; return; }
     timer = setTimeout(async () => {
       await getJaList();
@@ -905,8 +905,18 @@ function setupSuggest(inputId, suggestId, onSelect) {
   });
 }
 
-setupSuggest('battleInput','battleSuggest', searchPokemon);
-setupSuggest('partyInput', 'partySuggest',  addToParty);
+// 平仮名→カタカナ変換
+function toKatakana(str) {
+  return str.replace(/[ぁ-ゖ]/g, ch => String.fromCharCode(ch.charCodeAt(0) + 0x60));
+}
+
+// 入力を正規化（平仮名→カタカナ）
+function normalizeInput(str) {
+  return toKatakana(str.trim());
+}
+
+setupSuggest('battleInput','battleSuggest', q => searchPokemon(normalizeInput(q)));
+setupSuggest('partyInput', 'partySuggest',  q => addToParty(normalizeInput(q)));
 
 // ── BATTLE PAGE ──
 const battleResult = document.getElementById('battleResult');
