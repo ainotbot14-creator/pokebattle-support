@@ -639,11 +639,13 @@
     <div class="header-sub" id="headerSub">対戦サポートシステム</div>
   </div>
   <div class="theme-switcher" id="themeSwitcher">
-    <button class="theme-btn" data-theme="default" style="background:#f0f2f8;"></button>
-    <button class="theme-btn" data-theme="night"   style="background:#1e2030;"></button>
-    <button class="theme-btn" data-theme="forest"  style="background:#e8f0e8;"></button>
-    <button class="theme-btn" data-theme="sand"    style="background:#f5ede0;"></button>
-    <button class="theme-btn" data-theme="sky"     style="background:#e0eeff;"></button>
+    <button class="theme-btn" data-theme="default" style="background:#f0f2f8;" title="ノーマル"></button>
+    <button class="theme-btn" data-theme="night"   style="background:#1e2030;" title="ナイト"></button>
+    <button class="theme-btn" data-theme="gb"      style="background:#9bbc0f;border-color:#306230;" title="GB風"></button>
+    <button class="theme-btn" data-theme="gba"     style="background:linear-gradient(135deg,#d8e8f0 50%,#2060c0 50%);" title="GBA風(RSE)"></button>
+    <button class="theme-btn" data-theme="ds"      style="background:linear-gradient(135deg,#2d2d2d 50%,#ffcc00 50%);" title="DS風(DPPt)"></button>
+    <button class="theme-btn" data-theme="n3ds"    style="background:linear-gradient(135deg,#e8f4ff 50%,#0070d0 50%);" title="3DS風(XY)"></button>
+    <button class="theme-btn" data-theme="sv"      style="background:linear-gradient(135deg,#0d1b2a 50%,#ff6820 50%);" title="SV風"></button>
   </div>
 </div>
 
@@ -702,11 +704,20 @@
 <script>
 // ── THEMES ──
 const THEMES = {
-  default:{ '--bg':'#f0f2f8','--surface':'#ffffff','--surface2':'#f7f8fc','--border':'#e2e6f0','--text':'#1a1d2e','--text-sub':'#6b7280','--shadow':'0 2px 12px rgba(0,0,0,0.07)','--shadow-lg':'0 8px 32px rgba(0,0,0,0.12)' },
-  night:  { '--bg':'#1e2030','--surface':'#272a3f','--surface2':'#1e2236','--border':'#363a55','--text':'#e2e8f0','--text-sub':'#8892a4','--shadow':'0 2px 12px rgba(0,0,0,0.3)','--shadow-lg':'0 8px 32px rgba(0,0,0,0.45)' },
-  forest: { '--bg':'#e8f0e8','--surface':'#f4faf4','--surface2':'#edf6ed','--border':'#ccdece','--text':'#1a2d1a','--text-sub':'#4a6b4a','--shadow':'0 2px 12px rgba(0,0,0,0.07)','--shadow-lg':'0 8px 32px rgba(0,0,0,0.1)' },
-  sand:   { '--bg':'#f5ede0','--surface':'#fffdf8','--surface2':'#fdf6ec','--border':'#e8d9c4','--text':'#2d1e0f','--text-sub':'#7a5f3a','--shadow':'0 2px 12px rgba(0,0,0,0.07)','--shadow-lg':'0 8px 32px rgba(0,0,0,0.1)' },
-  sky:    { '--bg':'#e0eeff','--surface':'#f5f9ff','--surface2':'#eaf2ff','--border':'#c5d9f5','--text':'#0f1d3a','--text-sub':'#4a6080','--shadow':'0 2px 12px rgba(0,0,0,0.07)','--shadow-lg':'0 8px 32px rgba(0,0,0,0.1)' },
+  // ── シンプル ──
+  default:{ '--bg':'#f0f2f8','--surface':'#ffffff','--surface2':'#f7f8fc','--border':'#e2e6f0','--text':'#1a1d2e','--text-sub':'#6b7280','--accent':'#e8392a','--accent2':'#ff6b35','--radius':'12px','--radius-sm':'8px','--shadow':'0 2px 12px rgba(0,0,0,0.07)','--shadow-lg':'0 8px 32px rgba(0,0,0,0.12)' },
+  night:  { '--bg':'#1e2030','--surface':'#272a3f','--surface2':'#1e2236','--border':'#363a55','--text':'#e2e8f0','--text-sub':'#8892a4','--accent':'#e8392a','--accent2':'#ff6b35','--radius':'12px','--radius-sm':'8px','--shadow':'0 2px 12px rgba(0,0,0,0.3)','--shadow-lg':'0 8px 32px rgba(0,0,0,0.45)' },
+  // ── 戦闘画面風 ──
+  // GB戦闘風：初代のドット液晶グリーン
+  gb:     { '--bg':'#9bbc0f','--surface':'#8bac0f','--surface2':'#7a9c0a','--border':'#306230','--text':'#0f380f','--text-sub':'#1a5c1a','--accent':'#0f380f','--accent2':'#1a4f1a','--radius':'2px','--radius-sm':'2px','--shadow':'2px 2px 0 #306230','--shadow-lg':'4px 4px 0 #306230' },
+  // GBA戦闘風：RSEの白×青灰コマンドウィンドウ
+  gba:    { '--bg':'#d8e8f0','--surface':'#ffffff','--surface2':'#eaf2f8','--border':'#6090b8','--text':'#1a2840','--text-sub':'#4a6880','--accent':'#2060c0','--accent2':'#3878d8','--radius':'6px','--radius-sm':'4px','--shadow':'0 3px 0 #6090b8','--shadow-lg':'0 5px 0 #4a78a0' },
+  // DS戦闘風：DPPtの黒×白タッチパネルUI
+  ds:     { '--bg':'#1a1a1a','--surface':'#2d2d2d','--surface2':'#222222','--border':'#555555','--text':'#f0f0f0','--text-sub':'#aaaaaa','--accent':'#ffcc00','--accent2':'#ffdd33','--radius':'8px','--radius-sm':'5px','--shadow':'0 2px 0 #000000','--shadow-lg':'0 4px 0 #000000' },
+  // 3DS戦闘風：XYのパステル×丸みUI
+  n3ds:   { '--bg':'#e8f4ff','--surface':'#ffffff','--surface2':'#d0eaff','--border':'#80bfff','--text':'#1a3060','--text-sub':'#5080b0','--accent':'#0070d0','--accent2':'#3390e8','--radius':'20px','--radius-sm':'14px','--shadow':'0 4px 0 #80bfff','--shadow-lg':'0 6px 0 #60aaee' },
+  // SV戦闘風：スカバイの濃紺×オレンジUI
+  sv:     { '--bg':'#0d1b2a','--surface':'#162030','--surface2':'#0d1520','--border':'#1e3a50','--text':'#e8f0f8','--text-sub':'#7090a8','--accent':'#ff6820','--accent2':'#ff8840','--radius':'10px','--radius-sm':'6px','--shadow':'0 2px 12px rgba(255,104,32,0.15)','--shadow-lg':'0 6px 24px rgba(255,104,32,0.2)' },
 };
 
 function applyTheme(name) {
